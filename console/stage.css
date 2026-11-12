@@ -287,25 +287,34 @@ button.meta-chip::after { content: " ▾"; opacity: 0.7; }
 }
 .orbit-svg { width: 100%; height: 100%; }
 
-/* 중앙 퀀텀 싱귤래리티 핵 & 이중 회전 링 */
+/* 중앙 퀀텀 싱귤래리티 핵 & 이중 회전 링 — 삼각형 중앙(50%,50%) 고정 */
 .core-singularity {
-  position: absolute; width: 90px; height: 90px; border-radius: 50%;
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 90px; height: 90px; border-radius: 50%;
   background: radial-gradient(circle, #ffffff 0%, #70b0ff 38%, rgba(0, 240, 255, 0.3) 70%, transparent 100%);
   box-shadow: 0 0 50px #00f0ff, 0 0 100px rgba(0, 240, 255, 0.5);
   pointer-events: none;
 }
 .core-ring-blue {
-  position: absolute; width: 220px; height: 110px; border-radius: 50%;
+  position: absolute; top: 50%; left: 50%;
+  width: 220px; height: 110px; border-radius: 50%;
   border: 2.5px dotted #00f0ff; box-shadow: 0 0 25px #00f0ff;
-  transform: rotate(-30deg); animation: spinRing 16s linear infinite; pointer-events: none;
+  animation: spinRing 16s linear infinite; pointer-events: none;
 }
 .core-ring-orange {
-  position: absolute; width: 200px; height: 95px; border-radius: 50%;
+  position: absolute; top: 50%; left: 50%;
+  width: 200px; height: 95px; border-radius: 50%;
   border: 2.5px dotted #ff7700; box-shadow: 0 0 25px #ff7700;
-  transform: rotate(55deg); animation: spinRingReverse 12s linear infinite; pointer-events: none;
+  animation: spinRingReverse 12s linear infinite; pointer-events: none;
 }
-@keyframes spinRing { to { transform: rotate(330deg); } }
-@keyframes spinRingReverse { to { transform: rotate(-305deg); } }
+@keyframes spinRing {
+  from { transform: translate(-50%, -50%) rotate(-30deg); }
+  to   { transform: translate(-50%, -50%) rotate(330deg); }
+}
+@keyframes spinRingReverse {
+  from { transform: translate(-50%, -50%) rotate(55deg); }
+  to   { transform: translate(-50%, -50%) rotate(-305deg); }
+}
 
 /* 3개 성단 노드 라벨 & 발광 구체 (사진 3 일치) */
 .slot-label {
@@ -315,11 +324,12 @@ button.meta-chip::after { content: " ▾"; opacity: 0.7; }
 }
 .slot-label:hover { transform: translateX(-50%) scale(1.08) !important; filter: brightness(1.2); }
 
-/* SVG viewBox "0 0 500 440" 꼭지점 비율에 맞게 배치 */
-/* HEAD (250,50) = 50%, 11% / BUILDER (100,380) = 20%, bottom 14% / REVIEWER (400,380) = 80%, bottom 14% */
-.node-top  { top: 18px;  left: 50%; transform: translateX(-50%); }
-.node-left { bottom: 48px; left: 20%; transform: translateX(-50%); }
-.node-right{ bottom: 48px; left: 80%; transform: translateX(-50%); }
+/* 정삼각형 배치: viewBox 680×580, 중심(340,290), R=220
+   HEAD(340,70) BUILDER(149.5,400) REVIEWER(530.5,400)
+   top = (꼭지점y - star-orb반26) / 580, left = 꼭지점x / 680 */
+.node-top  { top: 7.6%;  left: 50%;  transform: translateX(-50%); }
+.node-left { top: 64.5%; left: 22%;  transform: translateX(-50%); }
+.node-right{ top: 64.5%; left: 78%;  transform: translateX(-50%); }
 
 .star-orb {
   width: 52px; height: 52px; border-radius: 50%; position: relative; margin-bottom: 6px;

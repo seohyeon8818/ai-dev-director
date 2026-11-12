@@ -78,11 +78,13 @@
     <div class="space-visual">
       <!-- 궤도 연결선 SVG -->
       <div class="orbit-triangle" aria-hidden="true">
-        <svg class="orbit-svg" viewBox="0 0 500 440">
-          <circle cx="250" cy="220" r="190" fill="none" stroke="rgba(0, 240, 255, 0.15)" stroke-width="1" stroke-dasharray="4,6" />
-          <line x1="250" y1="50" x2="100" y2="380" stroke="rgba(0, 240, 255, 0.25)" stroke-width="1.2" stroke-dasharray="2,4" />
-          <line x1="100" y1="380" x2="400" y2="380" stroke="rgba(255, 119, 0, 0.25)" stroke-width="1.2" stroke-dasharray="2,4" />
-          <line x1="400" y1="380" x2="250" y2="50" stroke="rgba(0, 240, 255, 0.25)" stroke-width="1.2" stroke-dasharray="2,4" />
+        <svg class="orbit-svg" viewBox="0 0 680 580">
+          <!-- 외접원: 중심(340,290) r=220 — 정삼각형 꼭지점을 지나는 원 -->
+          <circle cx="340" cy="290" r="220" fill="none" stroke="rgba(0, 240, 255, 0.15)" stroke-width="1" stroke-dasharray="4,6" />
+          <!-- 정삼각형 연결선: HEAD(340,70) BUILDER(149.5,400) REVIEWER(530.5,400) -->
+          <line x1="340" y1="70" x2="149.5" y2="400" stroke="rgba(0, 240, 255, 0.25)" stroke-width="1.2" stroke-dasharray="2,4" />
+          <line x1="149.5" y1="400" x2="530.5" y2="400" stroke="rgba(255, 119, 0, 0.25)" stroke-width="1.2" stroke-dasharray="2,4" />
+          <line x1="530.5" y1="400" x2="340" y2="70" stroke="rgba(0, 240, 255, 0.25)" stroke-width="1.2" stroke-dasharray="2,4" />
         </svg>
       </div>
 
