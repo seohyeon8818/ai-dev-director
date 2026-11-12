@@ -17,25 +17,35 @@ STATIC_FILES = {'/': 'index.html', '/console.js': 'console.js', '/console.css': 
                 '/stage.css': 'stage.css', '/trinity.js': 'trinity.js', '/stage.js': 'stage.js'}
 
 
+_pick_proc: "subprocess.Popen | None" = None
 _PICK_LOCK = threading.Lock()
 
 
 def pick_folder(initial: str = "", timeout: int = 300) -> dict:
     """Open the native folder dialog on this PC's desktop and return {'path': str} ('' when cancelled). One at a time."""
-    if not _PICK_LOCK.acquire(blocking=False):
-        return {"error": "폴더 선택 창이 이미 열려 있습니다."}
-    try:
-        out = subprocess.run([sys.executable, str(ROOT / "scripts" / "pick_folder.py"), initial or ""],
-                             capture_output=True, timeout=timeout)
-        if out.returncode != 0:
+    global _pick_proc
+    with _PICK_LOCK:
+        # 기존 프로세스가 아직 실행 중이면 종료 후 재시작
+        if _pick_proc is not None and _pick_proc.poll() is None:
+            _pick_proc.kill()
+        try:
+            _pick_proc = subprocess.Popen(
+                [sys.executable, str(ROOT / "scripts" / "pick_folder.py"), initial or ""],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
+        except OSError:
             return {"error": "폴더 선택 창을 열지 못했습니다."}
-        return {"path": str(json.loads(out.stdout.decode("ascii") or "{}").get("path", ""))}
+    # Lock 밖에서 대기 — 창이 열려있는 동안 서버 블로킹 방지
+    try:
+        stdout, _ = _pick_proc.communicate(timeout=timeout)
+        if _pick_proc.returncode != 0:
+            return {"error": "폴더 선택 창을 열지 못했습니다."}
+        return {"path": str(json.loads(stdout.decode("ascii") or "{}").get("path", ""))}
     except subprocess.TimeoutExpired:
+        _pick_proc.kill()
         return {"error": "폴더 선택 시간이 초과됐습니다."}
     except (OSError, ValueError):
         return {"error": "폴더 선택 창을 열지 못했습니다."}
-    finally:
-        _PICK_LOCK.release()
 
 
 def solomon_target_ok(path: str) -> tuple:
