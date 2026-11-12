@@ -379,8 +379,48 @@ function start(){
     finally{b.disabled=false;pollStatus();pollChat();}};
   for(const label of document.querySelectorAll('.slot-label')){label.title='이 역할을 맡을 AI 바꾸기';label.onclick=e=>{e.stopPropagation();openRoleMenu(label);};}
   document.addEventListener('click',e=>{if(!e.target.closest('#role-menu'))$('role-menu').hidden=true;});
-  $('btn-replay').onclick=startReplay;$('replay-stop').onclick=stopReplay;
+  if($('btn-replay')) $('btn-replay').onclick=startReplay;
+  if($('replay-stop')) $('replay-stop').onclick=stopReplay;
   if($('btn-broadcast')) $('btn-broadcast').onclick=()=>setBroadcast(!document.body.classList.contains('broadcast'));
+
+  // AI 역할 추가/배정 모달 연동
+  const modal=$('ai-modal');
+  if($('btn-ai-setup')&&modal){
+    $('btn-ai-setup').onclick=()=>{
+      if(roleSettings){
+        if($('select-head')) $('select-head').value=roleSettings.head||'antigravity';
+        if($('select-builder')) $('select-builder').value=roleSettings.builder||'claude';
+        if($('select-reviewer')) $('select-reviewer').value=roleSettings.reviewer||'antigravity';
+      }
+      modal.hidden=false;
+    };
+    if($('ai-modal-close')) $('ai-modal-close').onclick=()=>{modal.hidden=true;};
+    if($('ai-modal-cancel')) $('ai-modal-cancel').onclick=()=>{modal.hidden=true;};
+    if($('ai-modal-save')) $('ai-modal-save').onclick=async()=>{
+      const head=$('select-head').value;
+      const builder=$('select-builder').value;
+      const reviewer=$('select-reviewer').value;
+      const saveBtn=$('ai-modal-save');
+      saveBtn.disabled=true;
+      try{
+        const res=await fetch('/ops/roles',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','X-Solomon-Bridge':roleToken},
+          body:JSON.stringify({head,builder,reviewer})
+        });
+        const out=await res.json();
+        if(!res.ok)throw Error(out.error||'저장 실패');
+        roleSettings=out.roles;
+        modal.hidden=true;
+        notice('AI 역할 설정을 성공적으로 저장했습니다 · 다음 작업부터 적용됩니다');
+        pollRoles();
+      }catch(e){
+        notice('역할 저장 실패 · '+e.message);
+      }finally{
+        saveBtn.disabled=false;
+      }
+    };
+  }
   document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&document.body.classList.contains('broadcast'))setBroadcast(false);});
   for(const b of $('win-tabs').children)b.onclick=()=>{win=b.dataset.win;winAuto=false;repaint();};
   $('chat-peek').onclick=()=>{const log=$('chat-log');log.hidden=!log.hidden;$('chat-peek').setAttribute('aria-expanded',String(!log.hidden));if(!log.hidden)log.scrollTop=log.scrollHeight;};

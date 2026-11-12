@@ -26,7 +26,7 @@
   <nav class="top-actions" aria-label="화면 전환">
     <button type="button" id="tab-stage" class="on" aria-pressed="true">STAGE</button>
     <button type="button" id="tab-workshop" aria-pressed="false">WORKSHOP<em id="pending-badge" hidden></em></button>
-    <button type="button" id="btn-replay" title="지난 미션을 실제 기록으로 다시 보기 (R)">REPLAY</button>
+    <button type="button" id="btn-ai-setup" class="ai-add-btn" title="AI 추가 및 역할 배정">+ AI 추가/배정</button>
     <button type="button" id="btn-halt" title="실행 중인 미션을 멈춥니다 · 대시보드는 켜진 채로">HALT</button>
     <button type="button" id="btn-shutdown" title="AI DEV 시스템 중지 · 기록과 작업본은 남습니다">SHUTDOWN</button>
   </nav>
@@ -99,6 +99,54 @@
     <button type="submit" id="chat-send">DISPATCH &gt;&gt;</button>
   </form>
 </footer>
+
+<div id="ai-modal" class="hud-modal" hidden>
+  <div class="hud-modal-content">
+    <div class="hud-corner-tl"></div><div class="hud-corner-br"></div>
+    <div class="hud-modal-header">
+      <span class="hud-modal-title">// AI 추가 및 역할 배정 (ROLE ASSIGNMENT)</span>
+      <button type="button" id="ai-modal-close" class="modal-close-btn">&times;</button>
+    </div>
+    <div class="hud-modal-body">
+      <p class="modal-desc">각 역할(HEAD / BUILDER / REVIEWER)을 수행할 AI를 직접 지정하고 조합하세요.</p>
+      
+      <div class="role-select-group">
+        <label for="select-head"><span class="role-tag head">HEAD · 지휘/기획</span></label>
+        <select id="select-head" class="hud-select">
+          <option value="antigravity">Google Antigravity (권장)</option>
+          <option value="claude">Anthropic Claude Code</option>
+          <option value="openai">OpenAI ChatGPT / Codex</option>
+        </select>
+      </div>
+      
+      <div class="role-select-group">
+        <label for="select-builder"><span class="role-tag builder">BUILDER · 코드 구현</span></label>
+        <select id="select-builder" class="hud-select">
+          <option value="claude">Anthropic Claude Code (권장)</option>
+          <option value="antigravity">Google Antigravity</option>
+          <option value="openai">OpenAI ChatGPT / Codex</option>
+        </select>
+      </div>
+
+      <div class="role-select-group">
+        <label for="select-reviewer"><span class="role-tag reviewer">REVIEWER · 독립 검수</span></label>
+        <select id="select-reviewer" class="hud-select">
+          <option value="antigravity">Google Antigravity (권장)</option>
+          <option value="openai">OpenAI ChatGPT / Codex</option>
+          <option value="claude">Anthropic Claude Code</option>
+        </select>
+      </div>
+      
+      <div class="modal-hint">
+        💡 <b>추천 조합</b>: 기획(HEAD)=안티그래비티, 구현(BUILDER)=클로드, 검수(REVIEWER)=안티그래비티 또는 챗GPT
+      </div>
+    </div>
+    <div class="hud-modal-footer">
+      <button type="button" id="ai-modal-cancel" class="modal-btn cancel">취소</button>
+      <button type="button" id="ai-modal-save" class="modal-btn save">역할 배정 저장 &gt;&gt;</button>
+    </div>
+  </div>
+</div>
 
 <div id="attention" hidden><span id="attention-text"></span><button type="button" id="attention-go">작업실에서 확인</button></div>
 <div id="workshop" hidden><iframe id="workspace" title="AI DEV 작업실"></iframe></div>
