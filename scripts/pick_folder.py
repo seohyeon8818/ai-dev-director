@@ -9,8 +9,7 @@ def main() -> int:
         import tkinter
         from tkinter import filedialog
     except ImportError:          # e.g. Homebrew python on macOS without python-tk: type the path in the console instead
-        sys.stderr.write("tkinter unavailable
-")
+        sys.stderr.write("tkinter unavailable\n")
         return 1
     initial = sys.argv[1] if len(sys.argv) > 1 else ""
     root = tkinter.Tk()
