@@ -4,7 +4,7 @@
    Live and replay build the same model, so a replay shows exactly what the live view would have shown. */
 (function(){
 const $=id=>document.getElementById(id);
-const AI={ANTHROPIC:{name:'Claude',rgb:[1,.54,.36],css:'#ff8a5c'},OPENAI:{name:'Codex',rgb:[.24,.95,.75],css:'#3df2c0'},GOOGLE:{name:'Antigravity',rgb:[.42,.65,1],css:'#6aa5ff'}};
+const AI={ANTHROPIC:{name:'클로드 (Claude)',rgb:[1,.47,0],css:'#ff7700'},OPENAI:{name:'챗GPT (Codex)',rgb:[0,.94,1],css:'#00f0ff'},GOOGLE:{name:'안티그래비티 (Antigravity)',rgb:[0,.83,1],css:'#00d4ff'}};
 const ROLES=['HEAD','BUILDER','REVIEWER'];
 const ROLE_KO={HEAD:'HEAD · 지휘',BUILDER:'BUILDER · 구현',REVIEWER:'REVIEWER · 검수'};
 const DEFAULT_ASSIGN={HEAD:'GOOGLE',BUILDER:'ANTHROPIC',REVIEWER:'GOOGLE'};
