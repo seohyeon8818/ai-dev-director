@@ -276,9 +276,9 @@ button.meta-chip::after { content: " ▾"; opacity: 0.7; }
   padding: 8px 10px; border-radius: 4px;
 }
 
-/* 🌟 중앙 우주 성단 및 회전 궤도 코어 비주얼 (사진 3 100% 일치) */
+/* 🌟 중앙 우주 성단 및 회전 궤도 코어 비주얼 */
 .space-visual {
-  position: relative; width: 500px; height: 440px;
+  position: relative; width: 100%; max-width: 680px; height: 580px;
   display: flex; align-items: center; justify-content: center;
   margin: 0 auto;
 }
@@ -313,11 +313,13 @@ button.meta-chip::after { content: " ▾"; opacity: 0.7; }
   cursor: pointer; transition: transform 0.2s, opacity 0.8s;
   pointer-events: auto; will-change: transform; z-index: 10;
 }
-.slot-label:hover { transform: scale(1.08) !important; filter: brightness(1.2); }
+.slot-label:hover { transform: translateX(-50%) scale(1.08) !important; filter: brightness(1.2); }
 
-.node-top { top: 10px; left: 50%; transform: translateX(-50%); }
-.node-left { bottom: 25px; left: 35px; }
-.node-right { bottom: 25px; right: 35px; }
+/* SVG viewBox "0 0 500 440" 꼭지점 비율에 맞게 배치 */
+/* HEAD (250,50) = 50%, 11% / BUILDER (100,380) = 20%, bottom 14% / REVIEWER (400,380) = 80%, bottom 14% */
+.node-top  { top: 18px;  left: 50%; transform: translateX(-50%); }
+.node-left { bottom: 48px; left: 20%; transform: translateX(-50%); }
+.node-right{ bottom: 48px; left: 80%; transform: translateX(-50%); }
 
 .star-orb {
   width: 52px; height: 52px; border-radius: 50%; position: relative; margin-bottom: 6px;
