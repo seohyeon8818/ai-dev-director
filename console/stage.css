@@ -33,6 +33,12 @@ body.trinity {
   position: relative;
 }
 
+/* Trinity WebGL 활성 시 CSS orbital 요소 숨김 (파티클과 중복 방지) */
+body.trinity .orbit-triangle,
+body.trinity .core-singularity,
+body.trinity .core-ring-blue,
+body.trinity .core-ring-orange { display: none; }
+
 /* 딥 스페이스 다중 성운 & 별빛 레이어 */
 .space-bg {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
