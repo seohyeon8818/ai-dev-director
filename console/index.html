@@ -1,13 +1,17 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI DEV DIRECTOR · TRINITY</title><link rel="stylesheet" href="/stage.css"><script src="/trinity.js" defer></script><script src="/stage.js" defer></script><script src="/console.js" defer></script></head>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI DEV DIRECTOR · TRINITY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/stage.css"><script src="/trinity.js" defer></script><script src="/stage.js" defer></script><script src="/console.js" defer></script></head>
 <body class="trinity" data-view="stage" data-phase="IDLE">
 <canvas id="trinity-canvas" aria-hidden="true"></canvas>
-<div id="intro" aria-hidden="true"><span>THREE MINDS</span><strong>ONE CORE</strong></div>
+<div class="hud-grid" aria-hidden="true"></div>
 
 <header id="topbar">
   <div class="brand">
-    <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-    <div><strong>AI DEV DIRECTOR</strong><span>TRINITY · 세 AI, 하나의 지능</span></div>
+    <span class="brand-sigil" aria-hidden="true"></span>
+    <div><strong>AI DEV DIRECTOR</strong><span>DEEP SPACE COMMAND · 2-AI NATIVE</span></div>
   </div>
   <div class="top-meta">
     <button type="button" id="top-project" class="meta-chip" title="작업할 폴더 바꾸기">프로젝트 · —</button>
@@ -20,31 +24,31 @@
     <span id="top-clock" class="meta-clock">--:--:--</span>
   </div>
   <nav class="top-actions" aria-label="화면 전환">
-    <button type="button" id="tab-stage" class="on" aria-pressed="true">스테이지</button>
-    <button type="button" id="tab-workshop" aria-pressed="false">작업실<em id="pending-badge" hidden></em></button>
-    <button type="button" id="btn-replay" title="지난 미션을 실제 기록으로 다시 보기 (R)">다시보기</button>
-    <button type="button" id="btn-broadcast" title="방송 모드 (B)">방송 모드</button>
-    <button type="button" id="btn-halt" title="실행 중인 미션을 멈춥니다 · 대시보드는 켜진 채로">작업 정지</button>
-    <button type="button" id="btn-shutdown" title="AI DEV 시스템 중지 · 기록과 작업본은 남습니다">시스템 중지</button>
+    <button type="button" id="tab-stage" class="on" aria-pressed="true">STAGE</button>
+    <button type="button" id="tab-workshop" aria-pressed="false">WORKSHOP<em id="pending-badge" hidden></em></button>
+    <button type="button" id="btn-replay" title="지난 미션을 실제 기록으로 다시 보기 (R)">REPLAY</button>
+    <button type="button" id="btn-halt" title="실행 중인 미션을 멈춥니다 · 대시보드는 켜진 채로">HALT</button>
+    <button type="button" id="btn-shutdown" title="AI DEV 시스템 중지 · 기록과 작업본은 남습니다">SHUTDOWN</button>
   </nav>
 </header>
 
 <main id="stage">
-  <aside id="panel-now" class="glass" aria-live="polite">
-    <span class="kicker">지금</span>
+  <aside id="panel-now" class="glass hud-box" aria-live="polite">
+    <div class="hud-corner-tl"></div><div class="hud-corner-br"></div>
+    <span class="kicker">// CURRENT MISSION</span>
     <h2 id="now-headline">연결 중…</h2>
     <p id="now-sub">작업 기록을 읽고 있습니다.</p>
     <div class="now-timer"><b id="now-elapsed">00:00</b><span id="now-stage">대기</span></div>
 
     <section id="mission-card" class="card">
-      <div class="card-head"><span class="kicker">미션</span><span id="mission-badge" class="badge">—</span></div>
+      <div class="card-head"><span class="kicker">MISSION SPEC</span><span id="mission-badge" class="badge">—</span></div>
       <p id="mission-goal">아직 미션 기록이 없습니다.</p>
       <div id="mission-steps" class="steps" aria-label="미션 단계"></div>
       <small id="mission-meta"></small>
     </section>
 
     <section class="feed">
-      <span class="kicker">진행 기록</span>
+      <span class="kicker">// REALTIME FEED</span>
       <ol id="event-feed"></ol>
     </section>
   </aside>
@@ -69,9 +73,10 @@
     </div>
   </section>
 
-  <aside id="panel-work" class="glass">
+  <aside id="panel-work" class="glass hud-box">
+    <div class="hud-corner-tl"></div><div class="hud-corner-br"></div>
     <div class="card-head">
-      <span class="kicker">AI별 작업량</span>
+      <span class="kicker">// NEURAL CONSUMPTION</span>
       <div class="seg" id="win-tabs"><button type="button" data-win="mission">미션</button><button type="button" data-win="today">오늘</button><button type="button" data-win="all">전체</button></div>
     </div>
     <div class="total"><b id="total-tokens">0</b><span>토큰</span></div>
@@ -79,10 +84,10 @@
     <div id="share-bar" class="share" aria-hidden="true"><i data-p="ANTHROPIC"></i><i data-p="GOOGLE"></i><i data-p="OPENAI"></i></div>
     <div id="role-rows"></div>
     <section class="feed">
-      <span class="kicker">최근 AI 호출</span>
+      <span class="kicker">// RECENT CALLS</span>
       <ol id="call-feed"></ol>
     </section>
-    <small class="footnote">~ 는 글자 수로 추정한 값, 없으면 CLI가 보고한 실제 토큰입니다.</small>
+    <small class="footnote">~ 는 글자 수 추정값, 없으면 CLI 보고 실제 토큰입니다.</small>
   </aside>
 </main>
 
@@ -90,8 +95,8 @@
   <button type="button" id="chat-peek" aria-expanded="false" aria-controls="chat-log"><span id="peek-role">HEAD</span><span id="peek-text">대화 기록을 읽고 있습니다.</span></button>
   <div id="chat-log" hidden></div>
   <form id="chat-form">
-    <textarea id="chat-text" rows="1" maxlength="8000" placeholder="HEAD에게 지시하기 — 예: 캡션 글자 수 검사기를 만들어줘" aria-label="HEAD에게 지시하기"></textarea>
-    <button type="submit" id="chat-send">보내기</button>
+    <textarea id="chat-text" rows="1" maxlength="8000" placeholder="&gt; HEAD(안티그래비티)에게 명령 입력 (예: 캡션 검사기 모듈을 구현해줘)..." aria-label="HEAD에게 지시하기"></textarea>
+    <button type="submit" id="chat-send">DISPATCH &gt;&gt;</button>
   </form>
 </footer>
 

@@ -7,7 +7,7 @@ const $=id=>document.getElementById(id);
 const AI={ANTHROPIC:{name:'Claude',rgb:[1,.54,.36],css:'#ff8a5c'},OPENAI:{name:'Codex',rgb:[.24,.95,.75],css:'#3df2c0'},GOOGLE:{name:'Antigravity',rgb:[.42,.65,1],css:'#6aa5ff'}};
 const ROLES=['HEAD','BUILDER','REVIEWER'];
 const ROLE_KO={HEAD:'HEAD · 지휘',BUILDER:'BUILDER · 구현',REVIEWER:'REVIEWER · 검수'};
-const DEFAULT_ASSIGN={HEAD:'ANTHROPIC',BUILDER:'GOOGLE',REVIEWER:'OPENAI'};
+const DEFAULT_ASSIGN={HEAD:'GOOGLE',BUILDER:'ANTHROPIC',REVIEWER:'GOOGLE'};
 const PIPE=['PLANNING','BUILDING','VERIFYING','REVIEWING','DECIDING'];
 const PHASE={
   IDLE:{word:'대기',sub:'세 AI가 지시를 기다립니다',core:.18},
@@ -365,8 +365,9 @@ function setView(view){
   if(work){$('attention').hidden=true;setBroadcast(false);}
 }
 function setBroadcast(on){
-  document.body.classList.toggle('broadcast',on);$('btn-broadcast').textContent=on?'방송 모드 끝내기':'방송 모드';
-  try{if(on&&!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else if(!on&&document.fullscreenElement)document.exitFullscreen().catch(()=>{});}catch(e){/* fullscreen is optional */}
+  document.body.classList.toggle('broadcast',on);
+  const btn = $('btn-broadcast');
+  if(btn) btn.textContent=on?'방송 모드 끝내기':'방송 모드';
 }
 function start(){
   Trinity.init($('trinity-canvas'),{onFrame});
@@ -379,7 +380,7 @@ function start(){
   for(const label of document.querySelectorAll('.slot-label')){label.title='이 역할을 맡을 AI 바꾸기';label.onclick=e=>{e.stopPropagation();openRoleMenu(label);};}
   document.addEventListener('click',e=>{if(!e.target.closest('#role-menu'))$('role-menu').hidden=true;});
   $('btn-replay').onclick=startReplay;$('replay-stop').onclick=stopReplay;
-  $('btn-broadcast').onclick=()=>setBroadcast(!document.body.classList.contains('broadcast'));
+  if($('btn-broadcast')) $('btn-broadcast').onclick=()=>setBroadcast(!document.body.classList.contains('broadcast'));
   document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&document.body.classList.contains('broadcast'))setBroadcast(false);});
   for(const b of $('win-tabs').children)b.onclick=()=>{win=b.dataset.win;winAuto=false;repaint();};
   $('chat-peek').onclick=()=>{const log=$('chat-log');log.hidden=!log.hidden;$('chat-peek').setAttribute('aria-expanded',String(!log.hidden));if(!log.hidden)log.scrollTop=log.scrollHeight;};
