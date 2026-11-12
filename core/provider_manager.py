@@ -612,9 +612,14 @@ class ProviderManager:
                 assigned['reason'] = 'Manually selected CLI unavailable: ' + ', '.join(missing)
                 return assigned
         elif not openai_healthy:
-            # OpenAI down -> Claude steps in as HEAD & REVIEWER
-            assigned["head_provider"] = "claude"
-            assigned["reviewer_provider"] = "claude"
+            # OpenAI 비활성 시 요청된 역할 중 OpenAI(openai/codex)가 지정된 경우에만 Claude로 대체하고,
+            # 이미 정상(HEALTHY)인 Antigravity/Claude 2-AI 구성은 그대로 보존함
+            if assigned["head_provider"].lower() in ("openai", "codex"):
+                assigned["head_provider"] = "claude"
+            if assigned["builder_provider"].lower() in ("openai", "codex"):
+                assigned["builder_provider"] = "claude"
+            if assigned["reviewer_provider"].lower() in ("openai", "codex"):
+                assigned["reviewer_provider"] = "claude"
             assigned["reason"] = "OpenAI unavailable. Degraded mode active: Claude acting as Head and Reviewer."
         elif not google_healthy:
             # Google down -> Codex steps in as Builder, Claude as Reviewer

@@ -3,20 +3,20 @@
 # (Claude Code / OpenAI Codex / Google Antigravity). API keys in the environment are stripped before any CLI call.
 
 head:
-  provider: claude        # HEAD plans and directs corrections; the Reviewer judges independently.
+  provider: antigravity   # HEAD 기획·지시: Google Antigravity CLI (agy)
   # The model is whatever the CLI account's default model is; model flags are not passed through.
   executable: null        # Discovered automatically (PATH or the standard install folder)
 
 builder:
   mode: proposal          # Builder returns whole files as JSON; the Director validates and writes them.
-  provider: antigravity   # Primary BUILDER: Google Antigravity CLI (failover: codex / claude)
-  model: antigravity-cli
-  executable: null        # Discovered automatically via resolve_cli('agy')
+  provider: claude        # Primary BUILDER 구현: Claude Code CLI (claude)
+  model: claude-code-cli
+  executable: null        # Discovered automatically via resolve_cli('claude')
 
 reviewer:
-  provider: codex         # Primary REVIEWER: OpenAI Codex CLI (failover: claude)
-  model: codex-cli
-  executable: null        # Discovered automatically via resolve_cli('codex')
+  provider: antigravity   # Primary REVIEWER 독립 검수: Google Antigravity CLI (agy)
+  model: antigravity-cli
+  executable: null        # Discovered automatically via resolve_cli('agy')
 
 timeouts:
   head: 300
