@@ -106,6 +106,9 @@ class CompanionHandler(d.DashboardHandler):
         if path == '/ops/roles':
             from core.role_settings import current
             return self._send_json({'roles': current(d.load_config()), 'csrf': self.server.bridge_token})
+        if path == '/ops/ai-auth-status':
+            from core.ai_auth_helper import get_ai_auth_status
+            return self._send_json(get_ai_auth_status())
         if path in STATIC_FILES:
             name = STATIC_FILES[path]
             body = (ROOT / 'console' / name).read_bytes()
@@ -156,6 +159,17 @@ class CompanionHandler(d.DashboardHandler):
         return secrets.compare_digest(self.headers.get('X-Solomon-Bridge', ''), self.server.bridge_token)
 
     def do_POST(self):
+        if self.path == '/ops/ai-login':
+            if not d.is_request_origin_allowed(self.headers, self.server.server_address[1])[0] or not self.authorized():
+                return self._send_json({'error': 'local authenticated request required'}, 403)
+            try:
+                from core.ai_auth_helper import handle_ai_login
+                size = int(self.headers.get('Content-Length', '0'))
+                payload = json.loads(self.rfile.read(size)) if size > 0 else {}
+                res = handle_ai_login(payload)
+                return self._send_json(res, 200 if res.get('ok') else 400)
+            except Exception as exc:
+                return self._send_json({'error': str(exc)}, 500)
         if self.path == '/ops/roles':
             if not d.is_request_origin_allowed(self.headers, self.server.server_address[1])[0] or not self.authorized():
                 return self._send_json({'error': 'local authenticated request required'}, 403)

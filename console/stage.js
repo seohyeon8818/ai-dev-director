@@ -64,6 +64,12 @@ function openRoleMenu(label){
     b.type='button';b.setAttribute('role','menuitem');b.style.setProperty('--c',AI[p].css);b.classList.toggle('on',cur);
     b.append(el('small',cur?'현재':'지금 '+other+' → 서로 교체'));
     b.onclick=async()=>{if(cur){menu.hidden=true;return;}
+      if(p==='OPENAI'&&authStatus&&authStatus.openai&&!authStatus.openai.authed){
+        menu.hidden=true;
+        notice('챗GPT가 로그인되어 있지 않습니다 · 로그인 창을 엽니다');
+        openLoginModal();
+        return;
+      }
       const next={...roleSettings};next[other.toLowerCase()]=roleSettings[key];next[key]=CLI_OF[p];
       for(const x of menu.querySelectorAll('button'))x.disabled=true;
       try{const res=await fetch('/ops/roles',{method:'POST',headers:{'Content-Type':'application/json','X-Solomon-Bridge':roleToken},body:JSON.stringify(next)}),out=await res.json();
@@ -263,7 +269,9 @@ function onFrame(f){
   Trinity.focus({x:center.left/W,y:center.top/H,w:center.width/W,h:Math.max(.2,(center.height-foot)/H)});
   const u=f.unit,labels=document.querySelectorAll('.slot-label');
   $('stage-center').classList.toggle('compact',u<185);              // small scene: labels drop their stat line
-  labels.forEach((n,i)=>{const [x,y]=f.slots[i],w=n.offsetWidth,h=n.offsetHeight;
+  labels.forEach((n,i)=>{
+    if(n.classList.contains('node-top')||n.classList.contains('node-left')||n.classList.contains('node-right'))return;
+    const [x,y]=f.slots[i],w=n.offsetWidth,h=n.offsetHeight;
     let lx=i===0?x+u*.27:x-w/2,ly=i===0?y-h+4:y+u*.27;                 // HEAD: above-right; BUILDER/REVIEWER: centred below
     lx=Math.min(Math.max(lx-center.left,2),center.width-w-2);ly=Math.max(ly-center.top,2);
     n.style.transform='translate('+lx.toFixed(1)+'px,'+ly.toFixed(1)+'px)';});
@@ -383,10 +391,41 @@ function start(){
   if($('replay-stop')) $('replay-stop').onclick=stopReplay;
   if($('btn-broadcast')) $('btn-broadcast').onclick=()=>setBroadcast(!document.body.classList.contains('broadcast'));
 
+  // AI 연동 상태 조회 및 로그인 모달
+  let authStatus = null;
+  async function pollAuthStatus(){
+    try{
+      const res = await getJSON('/ops/ai-auth-status');
+      authStatus = res;
+      if($('pill-openai')){
+        const isAuthed = res.openai && res.openai.authed;
+        $('pill-openai').className = 'auth-pill ' + (isAuthed ? 'ok' : 'warn');
+        $('pill-openai').innerHTML = isAuthed ? 'ChatGPT ✅' : 'ChatGPT ⚠️ <button type="button" id="btn-open-login" class="pill-btn">로그인</button>';
+        if($('btn-open-login')) $('btn-open-login').onclick = openLoginModal;
+      }
+      if($('badge-openai')){
+        const isAuthed = res.openai && res.openai.authed;
+        $('badge-openai').className = 'auth-badge ' + (isAuthed ? 'ok' : 'warn');
+        $('badge-openai').textContent = isAuthed ? '연동 완료' : '로그인 필요';
+        if($('sub-openai')) $('sub-openai').textContent = res.openai.details;
+      }
+    }catch(e){/* ignore auth poll error */}
+  }
+
+  function openLoginModal(){
+    const loginModal = $('ai-login-modal');
+    if(loginModal){
+      loginModal.hidden = false;
+      pollAuthStatus();
+      if($('login-feedback')) $('login-feedback').hidden = true;
+    }
+  }
+
   // AI 역할 추가/배정 모달 연동
   const modal=$('ai-modal');
   if($('btn-ai-setup')&&modal){
     $('btn-ai-setup').onclick=()=>{
+      pollAuthStatus();
       if(roleSettings){
         if($('select-head')) $('select-head').value=roleSettings.head||'antigravity';
         if($('select-builder')) $('select-builder').value=roleSettings.builder||'claude';
@@ -396,10 +435,19 @@ function start(){
     };
     if($('ai-modal-close')) $('ai-modal-close').onclick=()=>{modal.hidden=true;};
     if($('ai-modal-cancel')) $('ai-modal-cancel').onclick=()=>{modal.hidden=true;};
+    if($('btn-open-login')) $('btn-open-login').onclick=openLoginModal;
     if($('ai-modal-save')) $('ai-modal-save').onclick=async()=>{
       const head=$('select-head').value;
       const builder=$('select-builder').value;
       const reviewer=$('select-reviewer').value;
+      
+      // 만약 미로그인된 openai를 선택했다면 바로 로그인 팝업 유도
+      if((head==='openai'||builder==='openai'||reviewer==='openai') && authStatus && authStatus.openai && !authStatus.openai.authed){
+        notice('챗GPT가 로그인되어 있지 않습니다 · 로그인 창을 엽니다');
+        openLoginModal();
+        return;
+      }
+
       const saveBtn=$('ai-modal-save');
       saveBtn.disabled=true;
       try{
@@ -421,6 +469,78 @@ function start(){
       }
     };
   }
+
+  // AI 로그인 전용 모달 이벤트
+  const loginModal = $('ai-login-modal');
+  if(loginModal){
+    if($('ai-login-close')) $('ai-login-close').onclick = ()=>{loginModal.hidden = true;};
+    if($('ai-login-done')) $('ai-login-done').onclick = ()=>{loginModal.hidden = true; pollAuthStatus(); pollRoles();};
+
+    // 방법 1: API 키 저장
+    if($('btn-save-key')) $('btn-save-key').onclick = async()=>{
+      const key = ($('input-openai-key').value||'').trim();
+      const fb = $('login-feedback');
+      if(!key){
+        fb.hidden = false; fb.className = 'login-feedback bad'; fb.textContent = 'OpenAI API 키를 입력해주세요.'; return;
+      }
+      $('btn-save-key').disabled = true;
+      try{
+        const res = await fetch('/ops/ai-login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json', 'X-Solomon-Bridge': roleToken},
+          body: JSON.stringify({provider: 'openai', action: 'save_key', api_key: key})
+        });
+        const data = await res.json();
+        fb.hidden = false;
+        if(res.ok && data.ok){
+          fb.className = 'login-feedback ok';
+          fb.textContent = data.message;
+          $('input-openai-key').value = '';
+          await pollAuthStatus();
+          notice('챗GPT API 키 등록 완료 · 챗GPT를 역할로 지정할 수 있습니다');
+        }else{
+          fb.className = 'login-feedback bad';
+          fb.textContent = data.error || '등록 실패';
+        }
+      }catch(e){
+        fb.hidden = false; fb.className = 'login-feedback bad'; fb.textContent = '통신 실패: ' + e.message;
+      }finally{
+        $('btn-save-key').disabled = false;
+      }
+    };
+
+    // 방법 2: 브라우저 로그인 창 실행
+    if($('btn-browser-login')) $('btn-browser-login').onclick = async()=>{
+      const fb = $('login-feedback');
+      try{
+        const res = await fetch('/ops/ai-login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json', 'X-Solomon-Bridge': roleToken},
+          body: JSON.stringify({provider: 'openai', action: 'browser_login'})
+        });
+        const data = await res.json();
+        fb.hidden = false;
+        if(res.ok && data.ok){
+          fb.className = 'login-feedback ok';
+          fb.textContent = data.message;
+        }else{
+          fb.className = 'login-feedback bad';
+          fb.textContent = data.error || '실행 실패';
+        }
+      }catch(e){
+        fb.hidden = false; fb.className = 'login-feedback bad'; fb.textContent = '실행 실패: ' + e.message;
+      }
+    };
+
+    // 상태 새로고침
+    if($('btn-refresh-auth')) $('btn-refresh-auth').onclick = async()=>{
+      await pollAuthStatus();
+      const fb = $('login-feedback');
+      fb.hidden = false;
+      fb.className = 'login-feedback ok';
+      fb.textContent = '최신 연동 상태를 확인했습니다.';
+    };
+  }
   document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&document.body.classList.contains('broadcast'))setBroadcast(false);});
   for(const b of $('win-tabs').children)b.onclick=()=>{win=b.dataset.win;winAuto=false;repaint();};
   $('chat-peek').onclick=()=>{const log=$('chat-log');log.hidden=!log.hidden;$('chat-peek').setAttribute('aria-expanded',String(!log.hidden));if(!log.hidden)log.scrollTop=log.scrollHeight;};
@@ -433,7 +553,8 @@ function start(){
     if(e.key==='b'||e.key==='B'||e.key==='ㅠ')setBroadcast(!document.body.classList.contains('broadcast'));
     if(e.key==='r'||e.key==='R'||e.key==='ㄱ')startReplay();});
   setInterval(()=>{const d=new Date();$('top-clock').textContent=[d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');if(!replay)tickTimer();},1000);
-  pollActivity();pollStatus();pollChat();pollRoles();setInterval(pollRoles,8000);
+  pollActivity();pollStatus();pollChat();pollRoles();pollAuthStatus();
+  setInterval(pollRoles,8000);setInterval(pollAuthStatus,10000);
   setInterval(pollActivity,3000);setInterval(pollStatus,6000);setInterval(pollChat,3000);
 }
 window.TrinityStage={model:()=>lastModel,replaying:()=>!!replay};

@@ -70,31 +70,53 @@
     </section>
   </aside>
 
-  <!-- 🌟 중앙: 사진과 100% 일치하는 대형 우주 성단 및 회전 궤도 코어 -->
+  <!-- 🌟 중앙: 사진 3 일치 우주 성단 및 회전 궤도 코어 비주얼 -->
   <section id="stage-center" aria-label="2-AI 작업 무대">
     <div id="stinger" aria-hidden="true"></div>
     <div id="role-menu" role="menu" hidden></div>
 
-    <!-- 3개 성단 AI 노드 라벨 (Trinity WebGL 3D 씬과 1:1 투영) -->
-    <div class="slot-label" data-slot="0">
-      <span class="slot-role">HEAD · 지휘</span>
-      <strong class="slot-name">안티그래비티</strong>
-      <span class="slot-status">대기</span>
-      <span class="slot-stat">오늘 1회 · ~698 토큰</span>
-    </div>
+    <div class="space-visual">
+      <!-- 궤도 연결선 SVG -->
+      <div class="orbit-triangle" aria-hidden="true">
+        <svg class="orbit-svg" viewBox="0 0 500 440">
+          <circle cx="250" cy="220" r="190" fill="none" stroke="rgba(0, 240, 255, 0.15)" stroke-width="1" stroke-dasharray="4,6" />
+          <line x1="250" y1="50" x2="100" y2="380" stroke="rgba(0, 240, 255, 0.25)" stroke-width="1.2" stroke-dasharray="2,4" />
+          <line x1="100" y1="380" x2="400" y2="380" stroke="rgba(255, 119, 0, 0.25)" stroke-width="1.2" stroke-dasharray="2,4" />
+          <line x1="400" y1="380" x2="250" y2="50" stroke="rgba(0, 240, 255, 0.25)" stroke-width="1.2" stroke-dasharray="2,4" />
+        </svg>
+      </div>
 
-    <div class="slot-label" data-slot="1">
-      <span class="slot-role">BUILDER · 구현</span>
-      <strong class="slot-name">클로드</strong>
-      <span class="slot-status">대기</span>
-      <span class="slot-stat">오늘 1회 · 0 토큰</span>
-    </div>
+      <!-- 중앙 퀀텀 핵 및 이중 회전 링 -->
+      <div class="core-singularity" aria-hidden="true"></div>
+      <div class="core-ring-blue" aria-hidden="true"></div>
+      <div class="core-ring-orange" aria-hidden="true"></div>
 
-    <div class="slot-label" data-slot="2">
-      <span class="slot-role">REVIEWER · 검수</span>
-      <strong class="slot-name">안티그래비티</strong>
-      <span class="slot-status">대기</span>
-      <span class="slot-stat">오늘 1회 · ~698 토큰</span>
+      <!-- 성단 1 (상단): HEAD 안티그래비티 -->
+      <div class="slot-label node-top" data-slot="0">
+        <div class="star-orb blue"></div>
+        <span class="slot-role">HEAD · 지휘</span>
+        <strong class="slot-name blue">Antigravity</strong>
+        <span class="slot-status">대기</span>
+        <span class="slot-stat">오늘 1회 · ~698 토큰</span>
+      </div>
+
+      <!-- 성단 2 (좌하단): BUILDER 클로드 -->
+      <div class="slot-label node-left" data-slot="1">
+        <div class="star-orb orange"></div>
+        <span class="slot-role">BUILDER · 구현</span>
+        <strong class="slot-name orange">Claude Code</strong>
+        <span class="slot-status">대기</span>
+        <span class="slot-stat">오늘 1회 · 0 토큰</span>
+      </div>
+
+      <!-- 성단 3 (우하단): REVIEWER 안티그래비티 -->
+      <div class="slot-label node-right" data-slot="2">
+        <div class="star-orb blue"></div>
+        <span class="slot-role">REVIEWER · 검수</span>
+        <strong class="slot-name blue">Antigravity</strong>
+        <span class="slot-status">대기</span>
+        <span class="slot-stat">오늘 1회 · ~698 토큰</span>
+      </div>
     </div>
 
     <!-- 하단 플로팅 파이프라인 바 -->
@@ -198,12 +220,81 @@
       </div>
       
       <div class="modal-hint">
-        💡 <b>추천 조합</b>: 기획(HEAD)=안티그래비티, 구현(BUILDER)=클로드, 검수(REVIEWER)=안티그래비티 또는 챗GPT
+        💡 <b>추천 조합</b>: 기획(HEAD)=안티그래비티, 구현(BUILDER)=클로드, 검수(REVIEWER)=안티그래비티 (2-AI 듀얼 체제)
+      </div>
+      <div class="auth-quick-bar">
+        <span class="auth-bar-label">AI 연동 상태:</span>
+        <span class="auth-pill ok" id="pill-agy">Google ✅</span>
+        <span class="auth-pill ok" id="pill-claude">Claude ✅</span>
+        <span class="auth-pill warn" id="pill-openai">ChatGPT ⚠️ <button type="button" id="btn-open-login" class="pill-btn">로그인</button></span>
       </div>
     </div>
     <div class="hud-modal-footer">
       <button type="button" id="ai-modal-cancel" class="modal-btn cancel">취소</button>
       <button type="button" id="ai-modal-save" class="modal-btn save">역할 배정 저장 &gt;&gt;</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI 로그인 및 인증 전용 HUD 모달 팝업 -->
+<div id="ai-login-modal" class="hud-modal" hidden>
+  <div class="hud-modal-content login-modal-box">
+    <div class="hud-corner-tl"></div><div class="hud-corner-br"></div>
+    <div class="hud-modal-header">
+      <span class="hud-modal-title">// AI 계정 인증 및 연결 Hub</span>
+      <button type="button" id="ai-login-close" class="modal-close-btn">&times;</button>
+    </div>
+    <div class="hud-modal-body">
+      <div class="auth-status-cards">
+        <div class="auth-card" id="card-google">
+          <div class="auth-card-head">
+            <strong>Google Antigravity</strong>
+            <span class="auth-badge ok">연동 완료</span>
+          </div>
+          <small class="auth-card-sub">기획/검수 특화 · agy.exe 1.4.5</small>
+        </div>
+        
+        <div class="auth-card" id="card-anthropic">
+          <div class="auth-card-head">
+            <strong>Anthropic Claude</strong>
+            <span class="auth-badge ok">연동 완료</span>
+          </div>
+          <small class="auth-card-sub">코드 구현 특화 · claude.exe 2.1.239</small>
+        </div>
+
+        <div class="auth-card warn" id="card-openai">
+          <div class="auth-card-head">
+            <strong>OpenAI ChatGPT (Codex)</strong>
+            <span class="auth-badge warn" id="badge-openai">로그인 필요</span>
+          </div>
+          <small class="auth-card-sub" id="sub-openai">미인증 상태입니다</small>
+        </div>
+      </div>
+
+      <div class="login-action-section">
+        <h4 class="section-title">🔑 챗GPT(OpenAI) 바로 로그인</h4>
+        <p class="section-desc">터미널을 열 필요 없이 웹 콘솔에서 바로 연결할 수 있습니다.</p>
+        
+        <div class="login-row">
+          <label for="input-openai-key" class="login-label">방법 1. OpenAI API Key 직접 입력</label>
+          <div class="key-input-group">
+            <input type="password" id="input-openai-key" class="hud-input" placeholder="sk-proj-... 또는 sk-... 키 붙여넣기">
+            <button type="button" id="btn-save-key" class="modal-btn save">키 저장 &amp; 연동</button>
+          </div>
+        </div>
+
+        <div class="login-row">
+          <label class="login-label">방법 2. 웹 브라우저 원클릭 로그인</label>
+          <div class="oauth-group">
+            <button type="button" id="btn-browser-login" class="modal-btn outline">🌐 브라우저 로그인 실행</button>
+            <button type="button" id="btn-refresh-auth" class="modal-btn cancel">↻ 상태 새로고침</button>
+          </div>
+        </div>
+        <div id="login-feedback" class="login-feedback" hidden></div>
+      </div>
+    </div>
+    <div class="hud-modal-footer">
+      <button type="button" id="ai-login-done" class="modal-btn save">완료</button>
     </div>
   </div>
 </div>

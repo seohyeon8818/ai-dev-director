@@ -273,45 +273,73 @@ button.meta-chip::after { content: " ▾"; opacity: 0.7; }
   padding: 8px 10px; border-radius: 4px;
 }
 
-/* 🌟 중앙 우주 3D 성단 노드 라벨 (Trinity WebGL 파티클 씬과 1:1 동기화) */
-.slot-label {
-  --c: #00f0ff;
-  position: absolute; left: 0; top: 0;
-  display: flex; flex-direction: column; gap: 1px; min-width: 140px;
-  align-items: center; text-align: center; padding-top: 9px;
-  will-change: transform; pointer-events: none; opacity: 0;
-  transition: opacity 0.8s;
-  z-index: 10;
+/* 🌟 중앙 우주 성단 및 회전 궤도 코어 비주얼 (사진 3 100% 일치) */
+.space-visual {
+  position: relative; width: 500px; height: 440px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto;
 }
-body.ready .slot-label { opacity: 1; pointer-events: auto; cursor: pointer; }
-.slot-label:hover { filter: brightness(1.2); }
-.slot-label::before {
-  content: ""; position: absolute; top: 0; left: 50%;
-  width: 34px; height: 2px; margin-left: -17px; border-radius: 2px;
-  background: var(--c); box-shadow: 0 0 12px var(--c);
+.orbit-triangle {
+  position: absolute; inset: 0; pointer-events: none;
 }
-.slot-label[data-slot="0"] {
-  align-items: flex-start; text-align: left; padding: 0 0 0 12px;
-  border-left: 2px solid var(--c);
-}
-.slot-label[data-slot="0"]::before { display: none; }
+.orbit-svg { width: 100%; height: 100%; }
 
-.slot-role { font: 700 11px var(--mono); letter-spacing: 0.16em; color: #94a3b8; text-transform: uppercase; }
+/* 중앙 퀀텀 싱귤래리티 핵 & 이중 회전 링 */
+.core-singularity {
+  position: absolute; width: 90px; height: 90px; border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #70b0ff 38%, rgba(0, 240, 255, 0.3) 70%, transparent 100%);
+  box-shadow: 0 0 50px #00f0ff, 0 0 100px rgba(0, 240, 255, 0.5);
+  pointer-events: none;
+}
+.core-ring-blue {
+  position: absolute; width: 220px; height: 110px; border-radius: 50%;
+  border: 2.5px dotted #00f0ff; box-shadow: 0 0 25px #00f0ff;
+  transform: rotate(-30deg); animation: spinRing 16s linear infinite; pointer-events: none;
+}
+.core-ring-orange {
+  position: absolute; width: 200px; height: 95px; border-radius: 50%;
+  border: 2.5px dotted #ff7700; box-shadow: 0 0 25px #ff7700;
+  transform: rotate(55deg); animation: spinRingReverse 12s linear infinite; pointer-events: none;
+}
+@keyframes spinRing { to { transform: rotate(330deg); } }
+@keyframes spinRingReverse { to { transform: rotate(-305deg); } }
+
+/* 3개 성단 노드 라벨 & 발광 구체 (사진 3 일치) */
+.slot-label {
+  position: absolute; display: flex; flex-direction: column; align-items: center;
+  cursor: pointer; transition: transform 0.2s, opacity 0.8s;
+  pointer-events: auto; will-change: transform; z-index: 10;
+}
+.slot-label:hover { transform: scale(1.08) !important; filter: brightness(1.2); }
+
+.node-top { top: 10px; left: 50%; transform: translateX(-50%); }
+.node-left { bottom: 25px; left: 35px; }
+.node-right { bottom: 25px; right: 35px; }
+
+.star-orb {
+  width: 52px; height: 52px; border-radius: 50%; position: relative; margin-bottom: 6px;
+}
+.star-orb.blue {
+  background: radial-gradient(circle, #ffffff 0%, #4da3ff 45%, rgba(0, 240, 255, 0.45) 70%, transparent 100%);
+  box-shadow: 0 0 35px #00f0ff, 0 0 70px rgba(0, 240, 255, 0.45);
+}
+.star-orb.orange {
+  background: radial-gradient(circle, #ffffff 0%, #ff7700 45%, rgba(255, 119, 0, 0.45) 70%, transparent 100%);
+  box-shadow: 0 0 35px #ff7700, 0 0 70px rgba(255, 119, 0, 0.45);
+}
+.star-orb::after {
+  content: ""; position: absolute; inset: -4px; border-radius: 50%;
+  border: 1px dashed rgba(255,255,255,0.6); animation: rotateOrbit 10s linear infinite;
+}
+@keyframes rotateOrbit { to { transform: rotate(360deg); } }
+
+.slot-role { font: 700 10.5px var(--mono); letter-spacing: 0.15em; color: #94a3b8; text-transform: uppercase; }
 .slot-role::after { content: " ▾"; opacity: 0.6; }
 .slot-name {
-  font: 800 20px/1.2 var(--body); color: var(--c);
-  text-shadow: 0 0 20px color-mix(in srgb, var(--c) 65%, transparent), 0 1px 12px #000;
-  margin-top: 2px;
+  font: 800 18px/1.2 var(--num); letter-spacing: 0.04em; margin-top: 2px;
 }
-.slot-status { font-size: 13px; color: #c6d2e8; text-shadow: 0 1px 8px #000; }
-.slot-label.busy .slot-status { color: #fff; font-weight: 700; }
-.slot-label.busy .slot-status::before {
-  content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
-  background: var(--c); margin-right: 7px; box-shadow: 0 0 0 0 var(--c);
-  animation: ping 1.3s infinite; vertical-align: 1px;
-}
-@keyframes ping { 70% { box-shadow: 0 0 0 9px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
-.slot-stat { font: 600 11px var(--num); color: #64748b; letter-spacing: 0.03em; }
+.slot-name.blue { color: #00f0ff; text-shadow: 0 0 14px #00f0ff; }
+.slot-name.orange { color: #ff7700; text-shadow: 0 0 14px #ff7700; }
 .slot-status { font-size: 11.5px; color: #cbd5e1; font-family: var(--mono); font-weight: 600; margin-top: 2px; }
 .slot-stat { font: 600 10.5px var(--mono); color: #64748b; margin-top: 1px; }
 
@@ -504,3 +532,71 @@ body[data-view="workshop"] #stage, body[data-view="workshop"] #composer { displa
   box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
 }
 .modal-btn.save:hover { filter: brightness(1.2); box-shadow: 0 0 22px rgba(0, 240, 255, 0.8); }
+.modal-btn.outline {
+  background: rgba(0, 240, 255, 0.1); border: 1px solid #00f0ff; color: #00f0ff;
+}
+.modal-btn.outline:hover { background: rgba(0, 240, 255, 0.2); }
+
+/* 빠른 연동 바 & 알약 버튼 */
+.auth-quick-bar {
+  display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px;
+  background: rgba(0, 0, 0, 0.4); padding: 8px 12px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.auth-bar-label { color: #94a3b8; }
+.auth-pill {
+  padding: 2px 8px; border-radius: 3px; font-size: 10.5px; font-weight: 700;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.auth-pill.ok { background: rgba(0, 255, 136, 0.12); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.3); }
+.auth-pill.warn { background: rgba(255, 170, 0, 0.15); color: #ffaa00; border: 1px solid rgba(255, 170, 0, 0.35); }
+.pill-btn {
+  background: #ffaa00; border: none; color: #000; font-weight: 800; font-size: 9.5px;
+  padding: 1px 6px; border-radius: 2px; cursor: pointer; margin-left: 2px;
+}
+.pill-btn:hover { filter: brightness(1.2); }
+
+/* AI 로그인 전용 모달 박스 */
+.login-modal-box {
+  width: 540px !important; max-width: 95vw;
+}
+.auth-status-cards {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 6px;
+}
+.auth-card {
+  background: rgba(2, 6, 16, 0.8); border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 4px; padding: 10px; display: flex; flex-direction: column; gap: 4px;
+}
+.auth-card.warn { border-color: rgba(255, 170, 0, 0.4); }
+.auth-card-head {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.auth-card-head strong { font-size: 11.5px; color: #fff; font-family: var(--mono); }
+.auth-badge {
+  display: inline-block; font-size: 9.5px; font-weight: 800; padding: 2px 6px; border-radius: 2px;
+  align-self: flex-start;
+}
+.auth-badge.ok { background: rgba(0, 255, 136, 0.18); color: #00ff88; }
+.auth-badge.warn { background: rgba(255, 170, 0, 0.22); color: #ffaa00; }
+.auth-card-sub { font-size: 10px; color: #64748b; font-family: var(--mono); }
+
+.login-action-section {
+  background: rgba(0, 240, 255, 0.03); border: 1px solid rgba(0, 240, 255, 0.15);
+  border-radius: 4px; padding: 14px; display: flex; flex-direction: column; gap: 12px;
+}
+.section-title { margin: 0; font-size: 12.5px; color: #00f0ff; font-family: var(--mono); font-weight: 800; }
+.section-desc { margin: 0; font-size: 11px; color: #94a3b8; font-family: var(--mono); }
+.login-row { display: flex; flex-direction: column; gap: 6px; }
+.login-label { font-size: 11px; color: #cbd5e1; font-family: var(--mono); font-weight: 700; }
+.key-input-group { display: flex; gap: 8px; }
+.hud-input {
+  flex: 1; height: 38px; padding: 0 10px; background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--line); border-radius: 4px; color: #fff;
+  font-family: var(--mono); font-size: 12px; outline: none;
+}
+.hud-input:focus { border-color: #00f0ff; box-shadow: 0 0 10px rgba(0, 240, 255, 0.4); }
+.oauth-group { display: flex; gap: 8px; }
+.login-feedback {
+  font-family: var(--mono); font-size: 11.5px; padding: 8px 10px; border-radius: 4px;
+}
+.login-feedback.ok { background: rgba(0, 255, 136, 0.15); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.3); }
+.login-feedback.bad { background: rgba(255, 51, 102, 0.15); color: #ff3366; border: 1px solid rgba(255, 51, 102, 0.3); }
